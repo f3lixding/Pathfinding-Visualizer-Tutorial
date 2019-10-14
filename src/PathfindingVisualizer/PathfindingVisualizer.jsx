@@ -85,7 +85,10 @@ export default class PathfindingVisualizer extends Component {
     this.animateProcess(visitedNodesInOrder, nodesInShortestPathOrder);
   }
 
-  reset() {}
+  reset() {
+    // reset the grid
+    window.location.reload();
+  }
 
   render() {
     const {grid, mouseIsPressed} = this.state;
@@ -98,9 +101,7 @@ export default class PathfindingVisualizer extends Component {
         <button onClick={() => this.visualizeAstar()}>
           Visualize A * Algorithm
         </button>
-        <button onClick={() => this.visualizeAstar()}>
-          Visualize A * Algorithm
-        </button>
+        <button onClick={() => this.reset()}>Reset</button>
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
