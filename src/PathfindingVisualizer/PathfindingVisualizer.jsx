@@ -85,6 +85,8 @@ export default class PathfindingVisualizer extends Component {
     this.animateProcess(visitedNodesInOrder, nodesInShortestPathOrder);
   }
 
+  reset() {}
+
   render() {
     const {grid, mouseIsPressed} = this.state;
 
@@ -92,6 +94,9 @@ export default class PathfindingVisualizer extends Component {
       <>
         <button onClick={() => this.visualizeDijkstra()}>
           Visualize Dijkstra's Algorithm
+        </button>
+        <button onClick={() => this.visualizeAstar()}>
+          Visualize A * Algorithm
         </button>
         <button onClick={() => this.visualizeAstar()}>
           Visualize A * Algorithm
