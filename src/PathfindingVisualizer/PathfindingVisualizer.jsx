@@ -17,6 +17,7 @@ export default class PathfindingVisualizer extends Component {
       grid: [],
       mouseIsPressed: false,
     };
+    this.message = 'component attributes can be customized';
   }
 
   componentDidMount() {

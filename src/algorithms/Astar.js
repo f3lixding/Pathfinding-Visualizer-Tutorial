@@ -5,6 +5,7 @@ function Astar(grid, startNode, finishNode) {
 
   // openSet contains nodes to be visited
   // closedSet contains nodes already visited (this is the array that gets returned for the visualization)
+
   var openSet = [];
   var closedSet = [];
   startNode.distance = 0;
