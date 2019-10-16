@@ -13,6 +13,7 @@ export default class Node extends Component {
       onMouseEnter,
       onMouseUp,
       row,
+      onMouseLeave,
     } = this.props;
     const extraClassName = isFinish
       ? 'node-finish'
@@ -28,7 +29,8 @@ export default class Node extends Component {
         className={`node ${extraClassName}`}
         onMouseDown={() => onMouseDown(row, col)}
         onMouseEnter={() => onMouseEnter(row, col)}
-        onMouseUp={() => onMouseUp()}></div>
+        onMouseUp={() => onMouseUp(row, col)}
+        onMouseLeave={() => onMouseLeave(row, col)}></div>
     );
   }
 }

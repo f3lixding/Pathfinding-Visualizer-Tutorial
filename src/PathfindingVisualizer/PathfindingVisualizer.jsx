@@ -5,10 +5,10 @@ import Astar from '../algorithms/Astar';
 
 import './PathfindingVisualizer.css';
 
-const START_NODE_ROW = 10;
-const START_NODE_COL = 15;
-const FINISH_NODE_ROW = 10;
-const FINISH_NODE_COL = 35;
+let START_NODE_ROW = 10;
+let START_NODE_COL = 15;
+let FINISH_NODE_ROW = 10;
+let FINISH_NODE_COL = 35;
 
 export default class PathfindingVisualizer extends Component {
   constructor() {
@@ -16,8 +16,8 @@ export default class PathfindingVisualizer extends Component {
     this.state = {
       grid: [],
       mouseIsPressed: false,
+      onCriticalPoint: '',
     };
-    this.message = 'component attributes can be customized';
   }
 
   componentDidMount() {
@@ -26,18 +26,63 @@ export default class PathfindingVisualizer extends Component {
   }
 
   handleMouseDown(row, col) {
-    const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
-    this.setState({grid: newGrid, mouseIsPressed: true});
+    // handle start or end point relocation
+    if (
+      (row === START_NODE_ROW && col === START_NODE_COL) ||
+      (row === FINISH_NODE_ROW && col === FINISH_NODE_COL)
+    ) {
+      this.setState({
+        mouseIsPressed: true,
+        onCriticalPoint:
+          row === START_NODE_ROW && col === START_NODE_COL
+            ? 'isStart'
+            : 'isFinish',
+      });
+    } else {
+      const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
+      this.setState({grid: newGrid, mouseIsPressed: true});
+    }
   }
 
   handleMouseEnter(row, col) {
     if (!this.state.mouseIsPressed) return;
-    const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
-    this.setState({grid: newGrid});
+    if (this.state.mouseIsPressed && !!this.state.onCriticalPoint) {
+      const newGrid = getCriticalPointToggled(
+        this.state.grid,
+        row,
+        col,
+        this.state.onCriticalPoint,
+      );
+      this.setState({grid: newGrid});
+    } else {
+      const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
+      this.setState({grid: newGrid});
+    }
   }
 
-  handleMouseUp() {
-    this.setState({mouseIsPressed: false});
+  handleMouseLeave(row, col) {
+    if (!this.state.mouseIsPressed) return;
+    if (this.state.mouseIsPressed && !!this.state.onCriticalPoint) {
+      const newGrid = getCriticalPointToggled(
+        this.state.grid,
+        row,
+        col,
+        this.state.onCriticalPoint,
+      );
+      this.setState({grid: newGrid});
+    }
+  }
+
+  handleMouseUp(row, col) {
+    // handle start or end point relocation
+    if (this.state.onCriticalPoint === 'isStart') {
+      START_NODE_ROW = row;
+      START_NODE_COL = col;
+    } else if (this.state.onCriticalPoint === 'isFinish') {
+      FINISH_NODE_ROW = row;
+      FINISH_NODE_COL = col;
+    }
+    this.setState({mouseIsPressed: false, onCriticalPoint: ''});
   }
 
   animateProcess(visitedNodesInOrder, nodesInShortestPathOrder) {
@@ -121,8 +166,11 @@ export default class PathfindingVisualizer extends Component {
                       onMouseEnter={(row, col) =>
                         this.handleMouseEnter(row, col)
                       }
-                      onMouseUp={() => this.handleMouseUp()}
-                      row={row}></Node>
+                      onMouseUp={(row, col) => this.handleMouseUp(row, col)}
+                      row={row}
+                      onMouseLeave={(row, col) =>
+                        this.handleMouseLeave(row, col)
+                      }></Node>
                   );
                 })}
               </div>
@@ -136,7 +184,7 @@ export default class PathfindingVisualizer extends Component {
 
 const getInitialGrid = () => {
   const grid = [];
-  for (let row = 0; row < 20; row++) {
+  for (let row = 0; row < 50; row++) {
     const currentRow = [];
     for (let col = 0; col < 50; col++) {
       currentRow.push(createNode(col, row));
@@ -167,6 +215,14 @@ const getNewGridWithWallToggled = (grid, row, col) => {
     ...node,
     isWall: !node.isWall,
   };
+  newGrid[row][col] = newNode;
+  return newGrid;
+};
+
+const getCriticalPointToggled = (grid, row, col, type) => {
+  const newGrid = grid.slice();
+  const newNode = newGrid[row][col];
+  newNode[type] = !newNode[type];
   newGrid[row][col] = newNode;
   return newGrid;
 };
